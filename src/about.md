@@ -1,7 +1,7 @@
 ---
 title: About wy.choi
 layout: about.njk
-name: About wy.choi
+name: wy.choi
 image: '/images/me.png'
 ---
 

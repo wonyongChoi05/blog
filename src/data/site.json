@@ -19,12 +19,5 @@
       "external": false
     }
   ],
-  "socialLinks": [
-    {
-      "text": "GitHub",
-      "url": "https://github.com/wonyongChoi05",
-      "external": true
-    }
-  ],
   "showFooterAttribution": true
 }
