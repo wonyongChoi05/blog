@@ -59,7 +59,10 @@ class AdsProcessor: KeyedProcessFunction<Long, AdsInfo, Long>() {
 
 또한 Key와 Timestamp는 중복으로 존재할 수 없기 때문에 Key와 Timestamp 당 최대 하나의 타이머가 존재한다. 동일한 타임스탬프에 여러 타이머가 등록된 경우는 onTimer(State의 Timer가 만료되었을 때 실행되는 메서드)가 단 한 번만 실행된다.
 
-또한 Flink는 processElement와 onTimer 메서드의 호출을 동기처리하기 때문에 사용자는 State에 대한 동시 수정에 대해 걱정하지 않아도 된다.
+Flink는 processElement와 onTimer 메서드의 호출을 동기처리하기 때문에 사용자는 State에 대한 동시 수정에 대해 걱정하지 않아도 된다.
+
+그리고 당연히 Timer에 대한 Fault Tolerance도 지원하기 때문에 Timer State 유실을 걱정하지 않아도 된다. (Flink K8s Operator를 사용한다면 deploy mode를 last-state로 설정)
+
 
 ## Timer로 상태 관리하기
 
