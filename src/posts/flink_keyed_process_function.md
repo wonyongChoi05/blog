@@ -4,7 +4,7 @@ description: 이번 글에서는 광고 빈도 제한(Frequency Capping)을 제�
 permalink: posts/{{ title | slug }}/index.html
 date: "2024-10-05"
 updated: "2024-10-05"
-tags: [Flink]
+tags: [Flink, Frequency Capping, Flink KeyedProcessFunction, StateBackend, Flink State]
 ---
 
 # 들어가며
