@@ -9,13 +9,13 @@ tags: [Flink]
 
 # 들어가며
 
-이번 글에서는 광고 빈도 제한(Frequency Capping)을 Flink로 제공하며 사용한 KeyedProcessFunction을 활용한 상태 관리와 그에 관한 몇 가지 트릭(Trick)을 소개한다. Flink의 Concept과 기본적인 개념들을 알고 있다는 가정하에 글을 작성한다. 또한 자세한 코드보다 흐름을 알 수 있는 코드 정도만 제공한다.
+이번 글에서는 사내에서 광고 빈도 제한(Frequency Capping)을 Flink로 제공하며 사용한 KeyedProcessFunction을 활용한 상태 관리와 그에 관한 몇 가지 트릭(Trick)을 소개한다. Flink의 Concept과 기본적인 개념들을 알고 있다는 가정하에 글을 작성한다. 또한 자세한 코드보다 흐름을 알 수 있는 코드 정도만 제공한다.
 
 # Background
 
 광고 빈도 제한을 위한 기본적인 요구 사항은 다음과 같다.
 
-- 유저 단위로 5일동안 어떠한 광고를 N번 이상 보면 해당 유저와 광고를 Redis에 Sink해주세요.
+- 유저 단위로 5일동안 어떠한 광고를 N번 이상 보면 해당 유저와 광고를 실시간으로 Redis에 Sink해주세요.
 
 위 요구사항을 위해 크게 아래와 같은 구조를 생각했다.
 
