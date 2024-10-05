@@ -271,8 +271,8 @@ override fun onTimer(
 ---
 
 - `RocksDB 최적화`: 블룸 필터 설정은 키 탐색 속도를 높이고, 압축 알고리즘(Snappy, LZ4 등)을 선택해 디스크 사용량과 성능을 조절할 수 있다. 또한 블록 캐시 크기를 조절하면 RocksDB의 I/O 성능을 개선할 수도 있다.
-- `병렬성(Parallelism) 조정` 작업의 병렬성을 조정하여 처리량을 늘리거나 줄일 수 있다.
-  - 주의할 점은 Source가 Kafka일 때 Source Topic의 파티션의 개수보다 많은 병렬성을 지정하는건 자원만 낭비할 뿐 의미가 없다.
+- `병렬성(Parallelism) 조정`: 작업의 병렬성을 조정하여 처리량을 늘리거나 줄일 수 있다.
+- - 주의할 점은 Source가 Kafka일 때 Source Topic의 파티션의 개수보다 많은 병렬성을 지정하는건 자원만 낭비할 뿐 의미가 없다.
   - 그렇다면, Source에서 Consume하는 Operator에만 파티션 수에 맞는 병렬성을 주고, 그 뒤의 Operator들에게는 많은 병렬성을 할당하고 싶으면 어떻게 할 수 있을까?
 - `Operator Chaining 설정`: CPU Intensive Operator를 위해 직접 operator chaining(disableChaining, startChaning)을 분리해서 사용하는 튜닝 기법이다.
   - Flink는 사용자가 명시적으로 파티셔닝(rebalance, shuffle, rescale, keyby 등)을 하지 않으면 모두 하나의 Task로 묶여서 실행된다.
