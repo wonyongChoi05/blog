@@ -1,14 +1,14 @@
 ---
-title: Flink KeyedProcessFunction으로 상태 관리하기
-description: 이번 글에서는 광고 빈도 제한(Frequency Capping)을 제공하며 사용한 KeyedProcessFunction을 활용한 상태 관리와 그에 관한 몇 가지 트릭(Trick)을 소개한다.
+title: Flink Task LifeCycle
+description: 이 글에서는 JobMaster가 ExecutionGraph를 생성하여 TaskExecutor에 제출하는 전체 프로세스의 순서와, Task와 StreamTask의 라이프사이클에 대해 설명한다.
 permalink: posts/{{ title | slug }}/index.html
 date: "2024-10-05"
 updated: "2024-10-05"
-tags: [Flink, Frequency Capping, Flink KeyedProcessFunction, StateBackend, Flink State]
+tags: [Flink, Flink Task, Flink LifeCycle]
 ---
 
 ## 들어가며
-이 글에서는 JobMaster가 ExecutionGraph를 생성하여 TaskExecutor에 제출하는 전체 프로세스의 순서와, Task와 StreamTask의 라이프사이클에 대해 설명한다.
+이 글에서는 JobMaster가 ExecutionGraph를 생성하여 TaskExecutor에 제출하는 전체 프로세스의 순서와, Task와 StreamTask의 라이프사이클에 대해 소개한다.
 
 # 객체와 개념
 
