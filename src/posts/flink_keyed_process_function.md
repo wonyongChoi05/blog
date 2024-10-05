@@ -25,7 +25,7 @@ tags: [Flink]
 
 그림으로 쉽게 표현하면 아래와 같다.
 
-![dd](../images/freq-capping-with-flink.png)
+![freq-capping-with-flink](/images/freq-capping-with-flink.png)
 
 # KeyedProcessFunction
 
