@@ -69,7 +69,7 @@ class AdsProcessor: KeyedProcessFunction<Long, AdsInfo, Long>() {
 private lateinit var viewedStat: MapState<String, Long>
 ```
 
-상태는 MapState와 ValueState로 만들 수 있으며, 필자는 유저 당 광고 조회수를 집계해야 하기 때문에 MapState를 활용했다. 참고로 `ValueState<Map<String, Long>>`과 같은 형태도 사용할 수 있지만, O(n^2)의 시간 복잡도를 가지기 때문에 스트리밍에서는 매우 비효율적이다.
+상태는 MapState와 ValueState로 만들 수 있으며, 필자는 유저 당 광고 조회수를 집계해야 하기 때문에 MapState를 활용했다. 참고로 `ValueState<Map<String, Long>>`과 같은 형태도 사용할 수 있지만, 최대 O(n)의 시간 복잡도를 가지기 때문에 스트리밍에서는 매우 비효율적이다.
 
 ## 상태 관리의 방식: HashMapStateBackend vs EmbeddedRocksDBStateBackend
 
