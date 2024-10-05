@@ -19,7 +19,8 @@
 
 .post__content {
   word-wrap: break-word;
-  line-height: 1.1;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
 }
 
 .post__aside {
