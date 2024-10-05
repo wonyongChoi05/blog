@@ -173,7 +173,8 @@ class AdsProcessor : KeyedProcessFunction<Long, AdsInfo, Long>() {
 #### Time.days(7)
 상태는 일주일만 관리한다. 일주일이 지나면 삭제된다.
 
-#### StateTtlConfig.UpdateType.OnCreateAndWrite: 상태가 처음 생성되거나, 상태에 새로운 값이 쓰일 때마다 TTL을 갱신한다.
+#### StateTtlConfig.UpdateType.OnCreateAndWrite
+상태가 처음 생성되거나, 상태에 새로운 값이 쓰일 때마다 TTL을 갱신한다.
 
 * 생성 시: 상태가 처음 생성되었을 때 TTL이 설정되며, 이 TTL은 생성 시각을 기준으로 시작된다.
 * 쓰기 시: 상태에 새로운 값이 쓸 때마다 TTL이 다시 갱신된다. 즉, 상태의 유효 기간이 매번 연장되는 효과가 있다.
@@ -196,7 +197,9 @@ override fun processElement(event: AdsInfo, p1: Context?, out: Collector<Long>?)
 
 ## 타이머 설정하기
 
-이 다음으로 가장 중요한 처리가 남아있다. 우리는 들어오는 모든 상태를 영원히 Append만 해서 되는 것이 아닌 최근 5일 동안의 데이터만 집계해야 하는 것이다. 즉, 오래된 상태(5일이 지난 데이터)는 제거해줘야 한다. 그러기 위해서는 위에서 간단하게 설명한 Timer를 설정할 수 있다.
+이 다음으로 가장 중요한 처리가 남아있다. 우리는 들어오는 모든 상태를 영원히 Append만 해서 되는 것이 아닌 최근 5일 동안의 데이터만 집계해야 하는 것이다. 
+
+즉, 오래된 상태(5일이 지난 데이터)는 제거해줘야 한다. 그러기 위해서는 위에서 간단하게 설명한 Timer를 설정할 수 있다.
 
 ```kotlin
 private fun setTimer(ctx: Context) {
