@@ -10,32 +10,32 @@ tags: [Flink, Flink Task, Flink LifeCycle]
 ## 들어가며
 이 글에서는 JobMaster가 ExecutionGraph를 생성하여 TaskExecutor에 제출하는 전체 프로세스의 순서와, Task와 StreamTask의 라이프사이클에 대해 소개한다.
 
-# 객체와 개념
+## 객체와 개념
 
-## Task
+### Task
 - Flink의 분산 실행을 위한 기본 단위.
 - 독립적인 스레드로 실행되며 여러 Task가 하나의 Task slot에 포함될 수 있음.
 - Operator 체인에서 Element(Input element, Watermark, Checkpoint barriers)를 전달하고 처리.
 
-## Operator
+### Operator
 - 데이터 처리의 논리를 구현한 작업 단위.
 - 병렬성에 따라 여러 **ExecutionVertex**를 포함.
 - 연속된 Operator는 조건에 따라 하나의 **JobVertex**로 체인(Chained)될 수 있음.
 
-## JobVertex
+### JobVertex
 - **JobGraph**의 구성 단위로, 여러 **Chained operator**를 하나로 묶은 것.
 - 각 JobVertex는 병렬 버전의 여러 **ExecutionVertex**로 확장됨.
 
-## ExecutionGraph
+### ExecutionGraph
 - 전체 작업의 병렬화 구조를 나타내는 그래프.
 - JobVertex를 여러 ExecutionVertex로 확장한 구조로 작업의 병렬 처리를 수행.
 
-## ExecutionJobVertex
+### ExecutionJobVertex
 - JobGraph의 한 정점을 나타내며, map 또는 join과 같은 연산을 수행
 - 모든 병렬 하위 작업의 집계된 상태를 보유
 - JobGraph의 해당 JobVertex에서 가져온 JobVertexID로 식별됨
 
-## ExecutionVertex
+### ExecutionVertex
 - 하나의 병렬 하위 작업을 나타냄
 
 ![image.png](/images/flink-subtask.png)
@@ -43,16 +43,16 @@ tags: [Flink, Flink Task, Flink LifeCycle]
 - 여기서 각 하위작업은 단일 스레드로 처리되는데, 아래서 설명
 - 각 ExecutionJobVertex와 병렬 하위 작업의 인덱스에 의해 식별됨
 
-## Execution
+### Execution
 - ExecutionVertex를 실행하려는 시도를 나타냄
 - 실패할 경우 또는 후속 작업에서 요청할 때 데이터가 더 이상 사용 가능하지 않은 경우에 대해 여러 번의 Execution이 발생할 수 있음
 - ExecutionAttempID로 식별하고, JM, TM 간의 모든 메시지는 이 ID를 이용하여 수신자를 지정함
 
-## StreamTask
+### StreamTask
 - Flink의 스트림 처리를 위한 모든 Task 하위 유형의 기본 클래스.
 - 라이프사이클 동안 **OperatorChain**을 사용하여 여러 Operator를 조작하고 실행.
 
-## OperatorChain
+### OperatorChain
 - 하나의 Task 내에서 여러 Operator를 연결하여 파이프라인 형태로 묶는 역할.
 - 각 Element를 Operator 간에 전달하면서 처리하는 구조.
 
