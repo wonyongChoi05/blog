@@ -1,7 +1,3 @@
-p {
-  margin-bottom: 0.5rem !important;
-}
-
 .post {
   display: flex;
   flex-direction: column;
@@ -27,7 +23,7 @@ p {
 }
 
 .post__aside {
-  margin-top: 2rem;
+  /* margin-top: 2rem; */
 }
 
 .post__tags {
