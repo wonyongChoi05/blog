@@ -75,14 +75,17 @@ private lateinit var viewedStat: MapState<String, Long>
 
 상태 관리를 위해 Flink는 두 가지 주요 상태 백엔드를 제공한다.
 
-1. HashMapStateBackend: 자바의 Heap 메모리를 기반으로 빠른 상태 접근이 가능한 백엔드
-    - 적합한 경우: 작은 상태 크기와 빠른 접근 속도가 중요한 경우
-  - 장점: 자바 힙 메모리에서 객체 상태로 관리하기 때문에 `직렬화/역직렬화` 비용이 들지 않음
-  - 단점: JVM `힙 메모리에 제약`이 있음
-2. EmbeddedRocksDBStateBackend: 디스크와 메모리를 함께 활용하여 대규모 상태를 관리
-   - 적합한 경우: 대규모 상태 관리 및 긴 기간의 윈도우가 필요한 경우
-   - 장점: 디스크 기반으로 상태 크기에 제한이 없으면 `증분 스냅샷`을 지원
-   - 단점: 데이터를 바이트 형태로 관리하기 때문에 `직렬화/역직렬화` 비용이 듦
+#### HashMapStateBackend
+
+자바의 Heap 메모리를 기반으로 빠른 상태 접근이 가능한 백엔드
+* 적합한 경우: 작은 상태 크기와 빠른 접근 속도가 중요한 경우
+* 장점: 자바 힙 메모리에서 객체 상태로 관리하기 때문에 `직렬화/역직렬화` 비용이 들지 않음
+* 단점: JVM `힙 메모리에 제약`이 있음
+
+#### EmbeddedRocksDBStateBackend: 디스크와 메모리를 함께 활용하여 대규모 상태를 관리
+* 적합한 경우: 대규모 상태 관리 및 긴 기간의 윈도우가 필요한 경우
+* 장점: 디스크 기반으로 상태 크기에 제한이 없으면 `증분 스냅샷`을 지원
+* 단점: 데이터를 바이트 형태로 관리하기 때문에 `직렬화/역직렬화` 비용이 듦
 
 ### 1. HashMapStateBackend
 
@@ -167,12 +170,17 @@ class AdsProcessor : KeyedProcessFunction<Long, AdsInfo, Long>() {
 }
 ```
 
-- Time.days(7): 상태는 일주일만 관리한다. 일주일이 지나면 삭제된다.
-- StateTtlConfig.UpdateType.OnCreateAndWrite: 상태가 처음 생성되거나, 상태에 새로운 값이 쓰일 때마다 TTL을 갱신한다.
-  - 생성 시: 상태가 처음 생성되었을 때 TTL이 설정되며, 이 TTL은 생성 시각을 기준으로 시작된다.
-  - 쓰기 시: 상태에 새로운 값이 쓸 때마다 TTL이 다시 갱신된다. 즉, 상태의 유효 기간이 매번 연장되는 효과가 있다.
-  - 읽기 시: TTL 갱신이 없으며, 마지막 쓰기 시각을 기준으로 TTL이 만료된다.
-- StateTtlConfig.StateVisibility.NeverReturnExpired: 만료된 상태를 반환하지 않는다. 만료된 상태에 접근하려고 하면 해당 상태는 존재하지 않는 것 처럼 취급한다. `ReturnExpiredIfNotCleanUp`으로 설정하면 TTL이 지난 상태에서도 읽을 수 있다.
+#### Time.days(7)
+상태는 일주일만 관리한다. 일주일이 지나면 삭제된다.
+
+#### StateTtlConfig.UpdateType.OnCreateAndWrite: 상태가 처음 생성되거나, 상태에 새로운 값이 쓰일 때마다 TTL을 갱신한다.
+
+* 생성 시: 상태가 처음 생성되었을 때 TTL이 설정되며, 이 TTL은 생성 시각을 기준으로 시작된다.
+* 쓰기 시: 상태에 새로운 값이 쓸 때마다 TTL이 다시 갱신된다. 즉, 상태의 유효 기간이 매번 연장되는 효과가 있다.
+* 읽기 시: TTL 갱신이 없으며, 마지막 쓰기 시각을 기준으로 TTL이 만료된다.
+
+#### StateTtlConfig.StateVisibility.NeverReturnExpired
+만료된 상태를 반환하지 않는다. 만료된 상태에 접근하려고 하면 해당 상태는 존재하지 않는 것 처럼 취급한다. `ReturnExpiredIfNotCleanUp`으로 설정하면 TTL이 지난 상태에서도 읽을 수 있다.
 
 ## 상태 집계하기
 
@@ -199,9 +207,12 @@ private fun setTimer(ctx: Context) {
 
 그런데 여기에는 여러가지 문제점들이 있다.
 
-1. Flink의 processingTime을 기준으로 타이머를 설정하기 때문에 스트리밍 초기에 kafka에서 earliest로 메세지를 컨슘할 때, 3일전 데이터라도 현재 시간을 기준으로 타이머가 설정된다는 것이다.
-   - 예를 들어 오늘이 2024/10/5일인데, 2024/10/2일 데이터의 타이머는 2024/10/2일 + 5일로 설정되어야 함에도 불구하고, processingTime이 오늘이라면 2024/10/5일 + 5일로 설정되는 것이다.
-2. onTimer 메서드에서 만료된 값을 알 수 없다.
+#### 1. Timer 설정의 기준
+Flink의 processingTime을 기준으로 타이머를 설정하기 때문에 스트리밍 초기에 kafka에서 earliest로 메세지를 컨슘할 때, 3일전 데이터라도 현재 시간을 기준으로 타이머가 설정된다는 것이다.
+
+예를 들어 오늘이 2024/10/5일인데, 2024/10/2일 데이터의 타이머는 2024/10/2일 + 5일로 설정되어야 함에도 불구하고, processingTime이 오늘이라면 2024/10/5일 + 5일로 설정되는 것이다.
+
+#### 2. onTimer 메서드에서 만료된 값을 알 수 없다.
 
    ```kotlin
    override fun onTimer(
@@ -213,8 +224,9 @@ private fun setTimer(ctx: Context) {
    }
    ```
 
-   - onTimer에서는 만료된 상태의 value에서 -1을 해주어야하고, 만약 value가 1이라면 key를 제거해줘야 한다.
-   - 하지만, 위 메서드 시그니처에서 만료된 상태가 무엇인지 어떻게 알 수 있을까? 지금 상태에서는 어떤 방법을 사용해도 알 수 없을 것이다.
+onTimer에서는 만료된 상태의 value에서 -1을 해주어야하고, 만약 value가 1이라면 key를 제거해줘야 한다.
+
+하지만, 위 메서드 시그니처에서 만료된 상태가 무엇인지 어떻게 알 수 있을까? 지금 상태에서는 어떤 방법을 사용해도 알 수 없을 것이다.
 
 ### Trick1. Timer 설정은 Flink Processing Time 대신 Event의 Processing Time을 활용하자
 
@@ -270,20 +282,41 @@ override fun onTimer(
 
 ---
 
-- `RocksDB 최적화`: 블룸 필터 설정은 키 탐색 속도를 높이고, 압축 알고리즘(Snappy, LZ4 등)을 선택해 디스크 사용량과 성능을 조절할 수 있다. 또한 블록 캐시 크기를 조절하면 RocksDB의 I/O 성능을 개선할 수도 있다.
-- `병렬성(Parallelism) 조정`: 작업의 병렬성을 조정하여 처리량을 늘리거나 줄일 수 있다.
-- - 주의할 점은 Source가 Kafka일 때 Source Topic의 파티션의 개수보다 많은 병렬성을 지정하는건 자원만 낭비할 뿐 의미가 없다.
-  - 그렇다면, Source에서 Consume하는 Operator에만 파티션 수에 맞는 병렬성을 주고, 그 뒤의 Operator들에게는 많은 병렬성을 할당하고 싶으면 어떻게 할 수 있을까?
-- `Operator Chaining 설정`: CPU Intensive Operator를 위해 직접 operator chaining(disableChaining, startChaning)을 분리해서 사용하는 튜닝 기법이다.
-  - Flink는 사용자가 명시적으로 파티셔닝(rebalance, shuffle, rescale, keyby 등)을 하지 않으면 모두 하나의 Task로 묶여서 실행된다.
-  - 따라서 startChaining, disableChaining을 통해 source에서 consume하는 부분과 CPU Intensive한 Operator들을 나누어 Chaining하면 태스크 간의 리소스 격리로 인한 비약적인 성능 개선을 기대할 수 있다.
-- `Checkpoint 설정`: 체크포인팅 주기를 적절히 설정한다.
-  - 너무 잦은 체크포인팅이나, 적절하지 않은 압축 방식은 성능에 해가 될 수도 있다.
-  - 또한 Flink의 Source가 2개 이상인 경우나 체크포인팅에서 병목이 발생한다면, unaligned checkpointing을 주목하자.
-- `State ttl 설정`: State의 TTL 주기를 적절히 설정한다.
-  - 너무 잦은 State TTL 설정은 TaskManager에게 매우 많은 부하를 발생시키며, 이로 인한 병목이 상당하다.
-  - 이러한 관점에서 데이터 유입량이 많은 피크 시간대 onTimer가 한 번에 많이 일어나지 않게 State TTL에 적절한 지터(jitter)를 주는 방법도 있다.
-- `공통 필터 적용`: 모든 Task에 공통적으로 적용되는 필터는 앞부분에서 적절히 필터하여 여러 Process에 분산되지 않게 한다.
-- `파티셔닝 주의하기`: 명시적으로 설정한 파티셔닝이 적절한지 확인한다.
-  - 사용자의 명시적인 파티셔닝(특히 KeyedProcessFunction에서는 keyBy)을 할 때 TaskManager 간의 Skew(데이터 불균형)가 일어나지 않도록 해야한다.
-  - keyBy 이후 불필요한 파티셔닝(rebalance, shuffle)등은 최대한 지양한다. (TM간의 데이터 교환 네트워크 비용이 들기 때문)
+#### RocksDB 최적화
+블룸 필터 설정은 키 탐색 속도를 높이고, 압축 알고리즘(Snappy, LZ4 등)을 선택해 디스크 사용량과 성능을 조절할 수 있다. 또한 블록 캐시 크기를 조절하면 RocksDB의 I/O 성능을 개선할 수도 있다.
+#### 병렬성(Parallelism) 조정
+작업의 병렬성을 조정하여 처리량을 늘리거나 줄일 수 있다.
+
+주의할 점은 Source가 Kafka일 때 Source Topic의 파티션의 개수보다 많은 병렬성을 지정하는건 자원만 낭비할 뿐 의미가 없다.
+
+그렇다면, Source에서 Consume하는 Operator에만 파티션 수에 맞는 병렬성을 주고, 그 뒤의 Operator들에게는 많은 병렬성을 할당하고 싶으면 어떻게 할 수 있을까?
+
+#### Operator Chaining 설정
+
+CPU Intensive Operator를 위해 직접 operator chaining(disableChaining, startChaning)을 분리해서 사용하는 튜닝 기법이다.
+
+Flink는 사용자가 명시적으로 파티셔닝(rebalance, shuffle, rescale, keyby 등)을 하지 않으면 모두 하나의 Task로 묶여서 실행된다.
+
+따라서 startChaining, disableChaining을 통해 source에서 consume하는 부분과 CPU Intensive한 Operator들을 나누어 Chaining하면 태스크 간의 리소스 격리로 인한 비약적인 성능 개선을 기대할 수 있다.
+#### Checkpoint 설정
+체크포인팅 주기를 적절히 설정한다.
+
+너무 잦은 체크포인팅이나, 적절하지 않은 압축 방식은 성능에 해가 될 수도 있다.
+
+또한 Flink의 Source가 2개 이상인 경우나 체크포인팅에서 병목이 발생한다면, unaligned checkpointing을 주목하자.
+
+#### State ttl 설정
+State의 TTL 주기를 적절히 설정한다.
+
+너무 잦은 State TTL 설정은 TaskManager에게 매우 많은 부하를 발생시키며, 이로 인한 병목이 상당하다.
+
+이러한 관점에서 데이터 유입량이 많은 피크 시간대 onTimer가 한 번에 많이 일어나지 않게 State TTL에 적절한 지터(jitter)를 주는 방법도 있다.
+
+#### 공통 필터 적용
+모든 Task에 공통적으로 적용되는 필터는 앞부분에서 적절히 필터하여 여러 Process에 분산되지 않게 한다.
+#### 파티셔닝 주의하기
+명시적으로 설정한 파티셔닝이 적절한지 확인한다.
+
+사용자의 명시적인 파티셔닝(특히 KeyedProcessFunction에서는 keyBy)을 할 때 TaskManager 간의 Skew(데이터 불균형)가 일어나지 않도록 해야한다.
+
+keyBy 이후 불필요한 파티셔닝(rebalance, shuffle)등은 최대한 지양한다. (TM간의 데이터 교환 네트워크 비용이 들기 때문)
