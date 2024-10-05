@@ -23,7 +23,7 @@
 }
 
 .post__aside {
-  /* margin-top: 2rem; */
+  margin-top: 0.5rem;
 }
 
 .post__tags {
@@ -36,7 +36,7 @@
 }
 
 .post__pagination {
-  margin-top: 2rem;
+  margin-top: 0.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
