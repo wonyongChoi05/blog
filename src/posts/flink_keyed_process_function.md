@@ -310,9 +310,7 @@ Flink는 사용자가 명시적으로 파티셔닝(rebalance, shuffle, rescale, 
 
 #### State ttl 설정
 State의 TTL 주기를 적절히 설정한다.
-
 너무 잦은 State TTL 설정은 TaskManager에게 매우 많은 부하를 발생시키며, 이로 인한 병목이 상당하다.
-
 이러한 관점에서 데이터 유입량이 많은 피크 시간대 onTimer가 한 번에 많이 일어나지 않게 State TTL에 적절한 지터(jitter)를 주는 방법도 있다.
 
 #### 공통 필터 적용
