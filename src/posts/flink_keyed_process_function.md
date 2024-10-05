@@ -285,37 +285,40 @@ override fun onTimer(
 
 ---
 
-#### RocksDB 최적화
+### RocksDB 최적화
 블룸 필터 설정은 키 탐색 속도를 높이고, 압축 알고리즘(Snappy, LZ4 등)을 선택해 디스크 사용량과 성능을 조절할 수 있다. 또한 블록 캐시 크기를 조절하면 RocksDB의 I/O 성능을 개선할 수도 있다.
-#### 병렬성(Parallelism) 조정
+### 병렬성(Parallelism) 조정
 작업의 병렬성을 조정하여 처리량을 늘리거나 줄일 수 있다.
 
 주의할 점은 Source가 Kafka일 때 Source Topic의 파티션의 개수보다 많은 병렬성을 지정하는건 자원만 낭비할 뿐 의미가 없다.
 
 그렇다면, Source에서 Consume하는 Operator에만 파티션 수에 맞는 병렬성을 주고, 그 뒤의 Operator들에게는 많은 병렬성을 할당하고 싶으면 어떻게 할 수 있을까?
 
-#### Operator Chaining 설정
+### Operator Chaining 설정
 
 CPU Intensive Operator를 위해 직접 operator chaining(disableChaining, startChaning)을 분리해서 사용하는 튜닝 기법이다.
 
 Flink는 사용자가 명시적으로 파티셔닝(rebalance, shuffle, rescale, keyby 등)을 하지 않으면 모두 하나의 Task로 묶여서 실행된다.
 
 따라서 startChaining, disableChaining을 통해 source에서 consume하는 부분과 CPU Intensive한 Operator들을 나누어 Chaining하면 태스크 간의 리소스 격리로 인한 비약적인 성능 개선을 기대할 수 있다.
-#### Checkpoint 설정
+### Checkpoint 설정
 체크포인팅 주기를 적절히 설정한다.
 
 너무 잦은 체크포인팅이나, 적절하지 않은 압축 방식은 성능에 해가 될 수도 있다.
 
 또한 Flink의 Source가 2개 이상인 경우나 체크포인팅에서 병목이 발생한다면, unaligned checkpointing을 주목하자.
 
-#### State ttl 설정
+### State ttl 설정
 State의 TTL 주기를 적절히 설정한다.
+
 너무 잦은 State TTL 설정은 TaskManager에게 매우 많은 부하를 발생시키며, 이로 인한 병목이 상당하다.
+
 이러한 관점에서 데이터 유입량이 많은 피크 시간대 onTimer가 한 번에 많이 일어나지 않게 State TTL에 적절한 지터(jitter)를 주는 방법도 있다.
 
-#### 공통 필터 적용
+### 공통 필터 적용
 모든 Task에 공통적으로 적용되는 필터는 앞부분에서 적절히 필터하여 여러 Process에 분산되지 않게 한다.
-#### 파티셔닝 주의하기
+
+### 파티셔닝 주의하기
 명시적으로 설정한 파티셔닝이 적절한지 확인한다.
 
 사용자의 명시적인 파티셔닝(특히 KeyedProcessFunction에서는 keyBy)을 할 때 TaskManager 간의 Skew(데이터 불균형)가 일어나지 않도록 해야한다.
