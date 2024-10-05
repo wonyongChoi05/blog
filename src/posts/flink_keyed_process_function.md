@@ -76,7 +76,7 @@ private lateinit var viewedStat: MapState<String, Long>
 상태 관리를 위해 Flink는 두 가지 주요 상태 백엔드를 제공한다.
 
 1. HashMapStateBackend: 자바의 Heap 메모리를 기반으로 빠른 상태 접근이 가능한 백엔드
-  - 적합한 경우: 작은 상태 크기와 빠른 접근 속도가 중요한 경우
+    - 적합한 경우: 작은 상태 크기와 빠른 접근 속도가 중요한 경우
   - 장점: 자바 힙 메모리에서 객체 상태로 관리하기 때문에 `직렬화/역직렬화` 비용이 들지 않음
   - 단점: JVM `힙 메모리에 제약`이 있음
 2. EmbeddedRocksDBStateBackend: 디스크와 메모리를 함께 활용하여 대규모 상태를 관리
