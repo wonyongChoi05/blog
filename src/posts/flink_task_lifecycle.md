@@ -72,9 +72,10 @@ tags: [Flink, Flink Task, Flink LifeCycle]
 ## Task 제출 및 실행
 
 1. Execution의 `deploy()` 메서드는 TaskManagerGateway의 `submitTask(…)` 를 사용하여 Task를 제출한다. 
-2. `RpcTaskManagerGateway` 인스턴스를 통해 TMRunner 프로세스로 전달되고, Akka RPC를 통해 해당 Task가 TM으로 전달된다.
+2. `RpcTaskManagerGateway` 인스턴스를 통해 TMRunner 프로세스로 전달되고, Pekko RPC를 통해 해당 Task가 TM으로 전달된다.
+> 기존에는 Akka 프레임워크를 사용했지만, 비용 문제로 인해 1.18부터 모두 Pekko RPC로 변경되었다.
 3. TMExecutor의 `submitTask()` 는 RPC로 전달된 task를 수신하여, 필요한 데이터를 준비한 후 Task 객체를 생성한다. 생성된 task는 `startTaskThread()` 메서드를 통해 스레드로 실행한다.
-    
+
 > TaskExecutor#submitTask
 ```java
     @Override
