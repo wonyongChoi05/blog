@@ -1,3 +1,7 @@
+p {
+  margin-bottom: 1rem;
+}
+
 .post {
   display: flex;
   flex-direction: column;
@@ -20,7 +24,6 @@
 .post__content {
   word-wrap: break-word;
   line-height: 1.4;
-  margin-bottom: 0.3rem;
 }
 
 .post__aside {
