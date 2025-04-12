@@ -7,7 +7,7 @@ updated: "2024-04-12"
 tags: [Iceberg, Iceberg Maintenance, Table format, Datalake]
 ---
 
-# Maintenance
+# Iceberg Maintenance
 
 ---
 
