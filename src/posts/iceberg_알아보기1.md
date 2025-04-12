@@ -2,8 +2,8 @@
 title: Apache Iceberg 살펴보기
 description: Apache Iceberg가 무엇이고, 대표적으로 제공하는 기능에 대해 알아봅니다.
 permalink: posts/{{ title | slug }}/index.html
-date: "2024-10-05"
-updated: "2024-10-05"
+date: "2025-04-03"
+updated: "2025-04-03"
 tags: [Iceberg, Table format, Datalake]
 ---
 
